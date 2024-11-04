@@ -50,7 +50,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * setPasswordAttribute
+     * Set the user's password.
      *
      * @param  mixed $value
      * @return void
@@ -58,5 +58,15 @@ class User extends Authenticatable
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = bcrypt($value);
+    }
+
+    /**
+     * Get the posts for the user.
+     *
+     * @return void
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
     }
 }
