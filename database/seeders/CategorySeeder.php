@@ -19,22 +19,37 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Tren Digital',
                 'slug' => 'tren-digital',
-                'description' => $faker->paragraph(2),
+                'description' => 'Fokus pada tren terbaru dalam teknologi digital, gadget, dan aplikasi.',
             ],
             [
                 'name' => 'Dunia Dev & Coding',
                 'slug' => 'dunia-dev-coding',
-                'description' => $faker->paragraph(2),
+                'description' => ' Berita dan update terbaru dari dunia pengembangan perangkat lunak, framework, dan bahasa pemrograman.',
             ],
             [
                 'name' => 'Inovasi & Startup',
                 'slug' => 'inovasi-startup',
-                'description' => $faker->paragraph(2),
+                'description' => 'Berita tentang startup, inovasi teknologi, dan kewirausahaan di bidang IT.',
             ],
             [
                 'name' => 'Blockchain & Kripto',
                 'slug' => 'blockchain-kripto',
-                'description' => $faker->paragraph(2),
+                'description' => 'Kategori untuk berita tentang blockchain, mata uang kripto, dan teknologi terdesentralisasi lainnya.',
+            ],
+            [
+                'name' => 'Mobile & Gadget',
+                'slug' => 'mobile-gadget',
+                'description' => 'Fokus pada perkembangan terbaru dari perangkat mobile, smartphone, dan gadget lainnya.',
+            ],
+            [
+                'name' => 'Teknologi Hijau',
+                'slug' => 'teknologi-hijau',
+                'description' => 'Fokus pada teknologi ramah lingkungan dan inovasi yang mendukung keberlanjutan.',
+            ],
+            [
+                'name' => 'AI & Machine Learning',
+                'slug' => 'ai-machine-learning',
+                'description' => 'Kategori khusus untuk berita terkait kecerdasan buatan, machine learning, dan aplikasi mereka dalam berbagai bidang.',
             ]
         ];
 

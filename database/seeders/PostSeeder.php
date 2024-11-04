@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -25,7 +26,7 @@ class PostSeeder extends Seeder
                 'content' => implode("\n\n", $faker->paragraphs(10)),
                 'status' => 'published',
                 'user_id' => 1,
-                'category_id' => collect([1, 2, 3, 4])->random(),
+                'category_id' => Category::query()->inRandomOrder()->first()->id,
             ]);
         }
     }
