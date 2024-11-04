@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostRequest;
 use App\Http\Resources\RestResource;
+use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -196,5 +197,23 @@ class PostController extends Controller
 
         // 200 OK response
         return response()->json(new RestResource([], 'Data Postingan Berhasil Dihapus!'), 200);
+    }
+
+    /**
+     * Fetching categories for select option
+     *
+     * @return void
+     */
+    public function fetchCategories()
+    {
+        $categories = Category::query()->select('id', 'name')->orderBy('name', 'asc')->get();
+
+        // Jika data kategori kosong
+        if ($categories->isEmpty()) {
+            return response()->json(new RestResource([], 'Data Kategori Kosong!', false), 404);
+        }
+
+        // Jika data kategori tidak kosong
+        return response()->json(new RestResource($categories, 'Data Kategori Berhasil Diambil!'), 200);
     }
 }

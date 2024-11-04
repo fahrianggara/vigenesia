@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,8 +23,12 @@ Route::post('login', [AuthController::class, 'login'])->name('login');
 
 // Fetch all posts
 Route::get('posts', [PostController::class, 'index'])->name('posts.index');
-Route::get('posts/show/{id}', [PostController::class, 'show'])->name('show');
+Route::get('posts/{id}', [PostController::class, 'show'])->name('show');
+Route::get('fetch-categories', [PostController::class, 'fetchCategories'])->name('fetch-categories');
 
+// Fetch all categories
+Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::get('categories/{id}', [CategoryController::class, 'show'])->name('categories.show');
 
 // If user is authenticated
 Route::middleware('auth:sanctum')->group(function () {
