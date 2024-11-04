@@ -21,11 +21,15 @@ class PostRequest extends FormRequest
      */
     public function rules(): array
     {
+        $thumbnail = $this->routeIs('posts.update')
+            ? 'nullable|image|mimes:jpg,jpeg,png|max:10240'
+            : 'required|image|mimes:jpg,jpeg,png|max:10240';
+
         return [
             'title' => 'required|string|min:3|max:100',
             'content' => 'required|string|min:10',
             'category_id' => 'required|exists:categories,id',
-            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'thumbnail' => $thumbnail,
             'status' => 'required|in:draft,published',
         ];
     }
@@ -47,7 +51,7 @@ class PostRequest extends FormRequest
             'category_id.exists' => 'Kategori tidak ditemukan!',
             'thumbnail.image' => 'Thumbnail harus berupa gambar!',
             'thumbnail.mimes' => 'Thumbnail harus berformat jpg, jpeg, atau png!',
-            'thumbnail.max' => 'Ukuran thumbnail maksimal 2MB!',
+            'thumbnail.max' => 'Ukuran thumbnail maksimal 10MB!',
             'status.required' => 'Status harus diisi!',
             'status.in' => 'Status harus draft atau published!',
         ];

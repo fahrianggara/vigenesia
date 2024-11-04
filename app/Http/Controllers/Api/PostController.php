@@ -7,7 +7,12 @@ use App\Http\Requests\PostRequest;
 use App\Http\Resources\RestResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Encoders\AutoEncoder;
+use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\ImageManager;
 
 class PostController extends Controller
 {
@@ -63,6 +68,25 @@ class PostController extends Controller
             return response()->json(new RestResource([], 'Judul sudah ada, silahkan gunakan judul yang berbeda!', false), 400);
         }
 
+        // Jika request memiliki file thumbnail
+        if ($request->hasFile('thumbnail'))
+        {
+            // get file thumbnail
+            $thumbnail = $request->file('thumbnail');
+
+            // for resize image
+            $manager = new ImageManager(Driver::class);
+            $thumbnailRead = $manager->read($thumbnail);
+            $thumbnailEncode = $thumbnailRead->encode(new AutoEncoder(quality: 50));
+
+            // create unique name for thumbnail and store in public/img/posts
+            $fileName = uniqid('thumbnail_') . '.' . $thumbnail->getClientOriginalExtension();
+            $thumbnailEncode->save(public_path('storage/img/posts/' . $fileName));
+
+            // save thumbnail name to database
+            $input['thumbnail'] = $fileName;
+        }
+
         $input['slug'] = Str::slug($input['title']);
         $input['user_id'] = $request->user()->id;
 
@@ -102,6 +126,35 @@ class PostController extends Controller
             return response()->json(new RestResource([], 'Judul sudah ada, silahkan gunakan judul yang berbeda!', false), 400);
         }
 
+        // Jika request tidak memiliki file thumbnail
+        if (!$request->hasFile('thumbnail')) {
+            $input['thumbnail'] = $post->thumbnail;
+        }
+
+        // Jika request memiliki file thumbnail
+        if ($request->hasFile('thumbnail'))
+        {
+            // get file thumbnail
+            $thumbnail = $request->file('thumbnail');
+
+            // for resize image
+            $manager = new ImageManager(Driver::class);
+            $thumbnailRead = $manager->read($thumbnail);
+            $thumbnailEncode = $thumbnailRead->encode(new AutoEncoder(quality: 20));
+
+            // delete old thumbnail
+            if (Storage::disk('public')->exists("img/posts/{$post->thumbnail}")) {
+                Storage::disk('public')->delete("img/posts/{$post->thumbnail}");
+            }
+
+            // create unique name for thumbnail and store in public/img/posts
+            $fileName = uniqid('thumbnail_') . '.' . $thumbnail->getClientOriginalExtension();
+            $thumbnailEncode->save(public_path('storage/img/posts/' . $fileName));
+
+            // save thumbnail name to database
+            $input['thumbnail'] = $fileName;
+        }
+
         $input['slug'] = Str::slug($input['title']);
         $input['category_id'] = (int) $input['category_id'];
 
@@ -118,7 +171,7 @@ class PostController extends Controller
      * @param  mixed  $id
      * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         // Cari post berdasarkan id
         $post = Post::query()->find($id);
@@ -126,6 +179,16 @@ class PostController extends Controller
         // Jika data post kosong
         if (!$post) {
             return response()->json(new RestResource([], 'Data Postingan Tidak Ditemukan!', false), 404);
+        }
+
+        // Jika user yang menghapus bukan pemilik post
+        if ($request->user()->id !== $post->user_id) {
+            return response()->json(new RestResource([], 'Anda tidak memiliki akses untuk menghapus postingan ini!', false), 403);
+        }
+
+        // Hapus thumbnail
+        if (Storage::disk('public')->exists("img/posts/{$post->thumbnail}")) {
+            Storage::disk('public')->delete("img/posts/{$post->thumbnail}");
         }
 
         // Hapus post
