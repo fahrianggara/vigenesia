@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,11 +16,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
+// Auth routes for guest user
 Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::post('login', [AuthController::class, 'login'])->name('login');
 
+// Fetch all posts
+Route::get('posts', [PostController::class, 'index'])->name('posts.index');
+Route::get('posts/show/{id}', [PostController::class, 'show'])->name('show');
+
+
+// If user is authenticated
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Route group for posts
+    Route::group(['prefix' => 'posts', 'as' => 'posts.'], function () {
+        Route::post('store', [PostController::class, 'store'])->name('store');
+        Route::post('update/{id}', [PostController::class, 'update'])->name('update');
+        Route::delete('destroy/{id}', [PostController::class, 'destroy'])->name('destroy');
+    });
+
+    // Auth routes for authenticated user
     Route::get('me', [AuthController::class, 'me'])->name('me');
     Route::delete('logout', [AuthController::class, 'logout'])->name('logout');
 });
