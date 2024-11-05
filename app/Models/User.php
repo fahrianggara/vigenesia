@@ -54,7 +54,6 @@ class User extends Authenticatable
         'photo_url',
     ];
 
-
     /**
      * Set the user's password.
      *
@@ -83,8 +82,8 @@ class User extends Authenticatable
      */
     public function getPhotoUrlAttribute()
     {
-        return (Storage::disk('public')->exists("img/users/{$this->thumbnail}"))
-            ? asset("storage/img/users/{$this->thumbnail}")
-            : asset('storage/img/thumbnail.png');
+        return (Storage::disk('public')->exists("img/users/{$this->photo}"))
+            ? asset("storage/img/users/{$this->photo}")
+            : asset('storage/img/photo.png');
     }
 }
