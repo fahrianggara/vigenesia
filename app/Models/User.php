@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -49,6 +50,11 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected $appends = [
+        'photo_url',
+    ];
+
+
     /**
      * Set the user's password.
      *
@@ -68,5 +74,17 @@ class User extends Authenticatable
     public function posts()
     {
         return $this->hasMany(Post::class);
+    }
+
+    /**
+     * Get the photo URL attribute.
+     *
+     * @return string
+     */
+    public function getPhotoUrlAttribute()
+    {
+        return (Storage::disk('public')->exists("img/users/{$this->thumbnail}"))
+            ? asset("storage/img/users/{$this->thumbnail}")
+            : asset('storage/img/thumbnail.png');
     }
 }

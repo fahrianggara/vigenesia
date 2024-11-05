@@ -78,7 +78,7 @@ class AuthController extends Controller
         if (!auth()->attempt($credentials)) {
             RateLimiter::hit($request->ip());
             $message = "Username atau password salah.";
-            return response()->json(new RestResource(null, $message, false), 401);
+            return response()->json(new RestResource(null, $message, false), 403);
         }
 
         // Menghapus catatan percobaan login yang gagal untuk IP ini
@@ -91,14 +91,13 @@ class AuthController extends Controller
         $user->update(['last_login' => now()]);
 
         // Menyusun data respons dengan email dan token akses
-        $data = [
-            'email' => $user->email, // Mengambil email pengguna
+        $data = array_merge($user->toArray(), [
             'access_token' => $user->createToken('auth_token')->plainTextToken, // Membuat token akses
             'token_type' => 'Bearer', // Menentukan jenis token
-        ];
+        ]);
 
         // Mengembalikan respons JSON dengan data pengguna dan pesan sukses
-        return response()->json(new RestResource($data, 'Kamu berhasil login.'), 200);
+        return response()->json(new RestResource($data, 'Kamu berhasil login ke dalam aplikasi.'), 200);
     }
 
     /**
@@ -119,6 +118,7 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        return response()->json(new RestResource($request->user(), 'Data pengguna berhasil diambil.'), 200);
+        $user = $request->user()->load('posts');
+        return response()->json(new RestResource($user, 'Data pengguna berhasil diambil.'), 200);
     }
 }

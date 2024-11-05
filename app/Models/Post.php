@@ -22,6 +22,8 @@ class Post extends Model
 
     protected $appends = ['thumbnail_url'];
 
+    protected $with = ['category', 'user'];
+
     /**
      * Get the category that owns the post.
      *
