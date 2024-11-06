@@ -64,7 +64,7 @@ class AuthController extends Controller
         // Memeriksa apakah terlalu banyak percobaan login dari IP ini
         if (RateLimiter::tooManyAttempts($request->ip(), 5)) {
             $timer = RateLimiter::availableIn($request->ip());
-            $message = "Terlalu banyak percobaan login. Silahkan coba lagi dalam $timer menit.";
+            $message = "Terlalu banyak percobaan login. Silahkan coba lagi dalam $timer detik.";
             return response()->json(new RestResource(null, $message, false), 429);
         }
 
@@ -77,7 +77,7 @@ class AuthController extends Controller
         // Mencoba untuk melakukan autentikasi dengan kredensial yang diberikan
         if (!auth()->attempt($credentials)) {
             RateLimiter::hit($request->ip());
-            $message = "Username atau password salah.";
+            $message = "Akun kamu tidak ditemukan! Silahkan coba lagi.";
             return response()->json(new RestResource(null, $message, false), 403);
         }
 
