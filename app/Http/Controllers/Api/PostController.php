@@ -22,17 +22,40 @@ class PostController extends Controller
      *
      * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::query()->with(['user', 'category'])->latest()->paginate(10);
+        // Ambil parameter page dan limit dari request, dengan nilai default
+        $page = $request->query('page', 1);
+        $limit = $request->query('limit', 8);
+
+        // Hitung offset berdasarkan page dan limit
+        $offset = ($page - 1) * $limit;
+
+        // Ambil data dengan offset dan limit
+        $posts = Post::query()
+            ->with(['user', 'category'])
+            ->latest()
+            ->skip($offset)
+            ->take($limit)
+            ->get();
 
         // Jika data post kosong
         if ($posts->isEmpty()) {
             return response()->json(new RestResource([], 'Data Postingan Kosong!', false), 404);
         }
 
-        // Jika data post tidak kosong
-        return response()->json(new RestResource($posts, 'Data Postingan Berhasil Diambil!'), 200);
+        // Total semua post untuk menentukan ada tidaknya halaman berikutnya
+        $totalPosts = Post::count();
+        $hasMore = ($offset + $limit) < $totalPosts;
+
+        // Gabungkan data post dengan info load more
+        $datas = array_merge($posts->toArray(), [
+            'current_page' => $page,
+            'has_more' => $hasMore,
+        ]);
+
+        // Response dengan data dan info load more
+        return response()->json(new RestResource($datas, 'Data Postingan Berhasil Diambil!'), 200);
     }
 
     /**
