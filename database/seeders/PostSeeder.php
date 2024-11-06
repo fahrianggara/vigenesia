@@ -16,7 +16,7 @@ class PostSeeder extends Seeder
     {
         $faker = \Faker\Factory::create();
 
-        for ($i = 0; $i < 5; $i++)
+        for ($i = 0; $i < 10; $i++)
         {
             $title = $faker->sentence(3);
 
