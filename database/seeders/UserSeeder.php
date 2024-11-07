@@ -21,5 +21,18 @@ class UserSeeder extends Seeder
             'role' => 'user',
             'email_verified_at' => now(),
         ]);
+
+        $faker = \Faker\Factory::create('id_ID');
+
+        for ($i = 0; $i < 2; $i++) {
+            User::query()->create([
+                'name' => $faker->name,
+                'email' => $faker->email,
+                'username' => $faker->userName,
+                'password' => 'password',
+                'role' => 'user',
+                'email_verified_at' => now(),
+            ]);
+        }
     }
 }
