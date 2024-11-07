@@ -18,6 +18,22 @@ use Intervention\Image\ImageManager;
 class PostController extends Controller
 {
     /**
+     * For carousel in home page
+     *
+     * @return void
+     */
+    public function carousel()
+    {
+        $posts = Post::query()
+            ->with(['user', 'category'])
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return response()->json(new RestResource($posts, 'Data Postingan Berhasil Diambil!'), 200);
+    }
+
+    /**
      * Fetching all posts
      *
      * @return JsonResponse
@@ -31,11 +47,11 @@ class PostController extends Controller
         // Hitung offset berdasarkan page dan limit
         $offset = ($page - 1) * $limit;
 
-        // Ambil data dengan offset dan limit
+        // Ambil data dengan offset, limit, dan skip posting yang ada di carousel
         $posts = Post::query()
             ->with(['user', 'category'])
             ->latest()
-            ->skip($offset)
+            ->skip(4 + $offset)  // Lewati 4 data pertama yang ditampilkan di carousel
             ->take($limit)
             ->get();
 
@@ -45,7 +61,7 @@ class PostController extends Controller
         }
 
         // Total semua post untuk menentukan ada tidaknya halaman berikutnya
-        $totalPosts = Post::count();
+        $totalPosts = Post::count() - 4;  // Kurangi 4 dari total untuk carousel
         $hasMore = ($offset + $limit) < $totalPosts;
 
         // Gabungkan data post dengan info load more
