@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +21,7 @@ class Post extends Model
         'category_id',
     ];
 
-    protected $appends = ['thumbnail_url'];
+    protected $appends = ['thumbnail_url', 'create_at_diff'];
 
     protected $with = ['category', 'user'];
 
@@ -54,5 +55,15 @@ class Post extends Model
         return (Storage::disk('public')->exists("img/posts/{$this->thumbnail}"))
             ? asset("storage/img/posts/{$this->thumbnail}")
             : asset('storage/img/thumbnail.png');
+    }
+
+    /**
+     * getCreateAtDiffAttribute
+     *
+     * @return void
+     */
+    public function getCreateAtDiffAttribute()
+    {
+        return Carbon::parse($this->created_at)->locale('id')->diffForHumans();
     }
 }
