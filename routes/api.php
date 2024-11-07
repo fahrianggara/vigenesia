@@ -22,6 +22,7 @@ Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::post('login', [AuthController::class, 'login'])->name('login');
 
 // Fetch all posts
+Route::get('posts/carousel', [PostController::class, 'carousel'])->name('carousel');
 Route::get('posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('posts/{id}', [PostController::class, 'show'])->name('show');
 Route::get('fetch-categories', [PostController::class, 'fetchCategories'])->name('fetch-categories');
