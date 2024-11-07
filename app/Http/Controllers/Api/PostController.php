@@ -64,14 +64,17 @@ class PostController extends Controller
         $totalPosts = Post::count() - 4;  // Kurangi 4 dari total untuk carousel
         $hasMore = ($offset + $limit) < $totalPosts;
 
-        // Gabungkan data post dengan info load more
-        $datas = array_merge($posts->toArray(), [
-            'current_page' => $page,
-            'has_more' => $hasMore,
-        ]);
-
         // Response dengan data dan info load more
-        return response()->json(new RestResource($datas, 'Data Postingan Berhasil Diambil!'), 200);
+        return response()->json(
+            [
+                'status' => true,
+                'message' => 'Data Postingan Berhasil Diambil!',
+                'data' => $posts,
+                'has_more' => $hasMore,
+                'total' => $totalPosts,
+            ],
+            200,
+        );
     }
 
     /**
