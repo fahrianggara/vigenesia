@@ -160,7 +160,7 @@ class PostController extends Controller
         }
 
         // Jika user yang mengedit bukan pemilik post
-        if ($request->user()->id !== $post->user_id) {
+        if ($request->user()->id != $post->user_id) {
             return response()->json(new RestResource([], 'Anda tidak memiliki akses untuk mengedit postingan ini!', false), 403);
         }
 
