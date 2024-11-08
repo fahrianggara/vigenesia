@@ -192,7 +192,7 @@ class PostController extends Controller
 
             // create unique name for thumbnail and store in public/img/posts
             $fileName = uniqid('thumbnail_') . '.' . $thumbnail->getClientOriginalExtension();
-            $thumbnailEncode->save(public_path('storage/img/posts/' . $fileName));
+            $thumbnailEncode->save(storage_path('app/public/img/posts/' . $fileName));
 
             // save thumbnail name to database
             $input['thumbnail'] = $fileName;
