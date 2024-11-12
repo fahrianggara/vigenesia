@@ -16,7 +16,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::query()->withCount('posts')->with('posts')->get();
+        $categories = Category::query()->whereHas('posts')
+            ->withCount('posts')->with('posts')->get();
 
         // Jika data kategori kosong
         if ($categories->isEmpty()) {
