@@ -21,15 +21,11 @@ class PostRequest extends FormRequest
      */
     public function rules(): array
     {
-        $thumbnail = $this->routeIs('posts.update')
-            ? 'nullable|image|mimes:jpg,jpeg,png|max:10240'
-            : 'required|image|mimes:jpg,jpeg,png|max:10240';
-
         return [
             'title' => 'required|string|min:3|max:100',
             'content' => 'required|string|min:10',
             'category_id' => 'required|exists:categories,id',
-            'thumbnail' => $thumbnail,
+            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
             'status' => 'required|in:draft,published',
         ];
     }
