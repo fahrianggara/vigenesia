@@ -43,6 +43,7 @@ class PostController extends Controller
         // Ambil parameter page dan limit dari request, dengan nilai default
         $page = $request->query('page', 1);
         $limit = $request->query('limit', 8);
+        $query = $request->query('q');
 
         // Hitung offset berdasarkan page dan limit
         $offset = ($page - 1) * $limit;
@@ -50,10 +51,20 @@ class PostController extends Controller
         // Ambil data dengan offset, limit, dan skip posting yang ada di carousel
         $posts = Post::query()
             ->with(['user', 'category'])
-            ->latest()
-            ->skip(4 + $offset)  // Lewati 4 data pertama yang ditampilkan di carousel
-            ->take($limit)
-            ->get();
+            ->latest();
+
+        // Jika terdapat query pencarian
+        if ($query) {
+            $posts = $posts->where('title', 'like', "%{$query}%")
+                ->skip($offset)
+                ->take($limit);
+        } else { // <-- buat dihalaman beranda
+            $posts = $posts->skip(4 + $offset)  // Lewati 4 data pertama yang ditampilkan di carousel
+                ->take($limit);
+        }
+
+        // Ambil data post
+        $posts = $posts->get();
 
         // Jika data post kosong
         if ($posts->isEmpty()) {
@@ -61,7 +72,11 @@ class PostController extends Controller
         }
 
         // Total semua post untuk menentukan ada tidaknya halaman berikutnya
-        $totalPosts = Post::count() - 4;  // Kurangi 4 dari total untuk carousel
+        $totalPosts = $query
+            ? Post::query()->where('title', 'like', "%{$query}%")->count()
+            : Post::count() - 4;
+
+        // Cek apakah ada data berikutnya
         $hasMore = ($offset + $limit) < $totalPosts;
 
         // Response dengan data dan info load more
