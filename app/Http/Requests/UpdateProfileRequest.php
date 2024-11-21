@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterRequest extends FormRequest
+class UpdateProfileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,11 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|min:3|max:30',
-            'username' => 'required|string|max:30|unique:users,username|regex:/^[a-z0-9]+$/',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|max:16',
-            'password_confirmation' => 'required|same:password',
+            'name' => 'nullable|string|max:30|min:3',
+            'username' => 'nullable|string|max:30|unique:users,username|regex:/^[a-z0-9]+$/',
+            'password' => $this->input('password') ? 'required|string' : 'nullable',
+            'new_password' => $this->input('password') ? 'required|string|min:8|max:16' : 'nullable',
+            'password_confirmation' => $this->input('password') ? 'required|same:new_password' : 'nullable',
         ];
     }
 
@@ -38,20 +38,19 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama harus diisi!',
-            'username.required' => 'Username harus diisi!',
+            'name.string' => 'Nama harus berupa teks!',
+            'name.max' => 'Nama maksimal 30 karakter!',
+            'name.min' => 'Nama minimal 3 karakter!',
             'username.string' => 'Username harus berupa teks!',
             'username.max' => 'Username maksimal 30 karakter!',
             'username.regex' => 'Username harus berupa huruf kecil dan angka tanpa spasi!',
             'username.unique' => 'Username tersebut sudah ada!',
-            'email.required' => 'Email harus diisi!',
-            'email.unique' => 'Email tersebut sudah terdaftar!',
-            'email.email' => 'Silahkan masukkan email yang valid!',
             'password.required' => 'Password harus diisi!',
-            'password.min' => 'Password minimal 8 karakter!',
-            'password.max' => 'Password maksimal 16 karakter!',
+            'new_password.required' => 'Password baru harus diisi!',
+            'new_password.min' => 'Password baru minimal 8 karakter!',
+            'new_password.max' => 'Password baru maksimal 16 karakter!',
             'password_confirmation.required' => 'Konfirmasi password harus diisi!',
-            'password_confirmation.same' => 'Konfirmasi password tidak sama dengan password!',
+            'password_confirmation.same' => 'Konfirmasi password tidak sama dengan password baru!',
         ];
     }
 }

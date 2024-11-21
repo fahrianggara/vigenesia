@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth routes for authenticated user
     Route::get('me', [AuthController::class, 'me'])->name('me');
     Route::post('change-photo', [AuthController::class, 'changePhoto'])->name('change-photo');
+    Route::post('update-profile', [AuthController::class, 'updateProfile'])->name('update-profile');
     Route::delete('logout', [AuthController::class, 'logout'])->name('logout');
 
 });

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ChangePhotoRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\RestResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -128,7 +129,7 @@ class AuthController extends Controller
     }
 
     /**
-     * changePhoto
+     * Change user photo.
      *
      * @param  mixed $request
      * @return void
@@ -169,5 +170,49 @@ class AuthController extends Controller
         $user->update(['photo' => $fileName]);
 
         return response()->json(new RestResource($user, 'Foto kamu berhasil diubah.'), 200);
+    }
+
+    /**
+     * Update user profile.
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        $user = $request->user();
+
+        // Jika request memiliki parameter 'password'
+        if (isset($request->password)) {
+            if (!password_verify($request->password, $user->password)) {
+                return response()->json([
+                    'message' => 'Password lama yang kamu tidak sesuai.',
+                    'errors' => [
+                        'password' => ['Password lama yang kamu tidak sesuai.'],
+                    ],
+                ]);
+            }
+
+            // Mengubah password pengguna
+            $user->update(['password' => $request->new_password]);
+
+            return response()->json(new RestResource($user, 'Password kamu berhasil diubah.'), 200);
+        }
+
+        // Isi data baru ke model user
+        $user->fill([
+            'name' => $request->name ?? $user->name,
+            'username' => $request->username ?? $user->username,
+        ]);
+
+        // Cek apakah ada perubahan
+        if (!$user->isDirty()) {
+            return response()->json(new RestResource(null, 'Tidak ada perubahan pada profil kamu.', false), 400);
+        }
+
+        // Simpan perubahan
+        $user->save();
+
+        return response()->json(new RestResource($user, 'Profil kamu berhasil diubah.'), 200);
     }
 }
