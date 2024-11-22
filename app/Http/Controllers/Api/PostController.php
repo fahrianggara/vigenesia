@@ -175,9 +175,9 @@ class PostController extends Controller
         }
 
         // Jika user yang mengedit bukan pemilik post
-        if ($request->user()->id != $post->user_id) {
-            return response()->json(new RestResource([], 'Anda tidak memiliki akses untuk mengedit postingan ini!', false), 403);
-        }
+        // if ($request->user()->id != $post->user_id) {
+        //     return response()->json(new RestResource([], 'Anda tidak memiliki akses untuk mengedit postingan ini!', false), 403);
+        // }
 
         // Jika slug ada yang sama
         if (Post::query()->where('slug', Str::slug($input['title']))->where('id', '!=', $id)->exists()) {
@@ -240,9 +240,9 @@ class PostController extends Controller
         }
 
         // Jika user yang menghapus bukan pemilik post
-        if ($request->user()->id !== $post->user_id) {
-            return response()->json(new RestResource([], 'Anda tidak memiliki akses untuk menghapus postingan ini!', false), 403);
-        }
+        // if ($request->user()->id !== $post->user_id) {
+        //     return response()->json(new RestResource([], 'Anda tidak memiliki akses untuk menghapus postingan ini!', false), 403);
+        // }
 
         // Hapus thumbnail
         if (Storage::disk('public')->exists("img/posts/{$post->thumbnail}")) {

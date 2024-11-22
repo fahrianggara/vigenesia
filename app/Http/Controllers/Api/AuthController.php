@@ -4,13 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangePhotoRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\RestResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Encoders\AutoEncoder;
+use Intervention\Image\ImageManager;
 
 class AuthController extends Controller
 {
@@ -120,5 +126,93 @@ class AuthController extends Controller
     {
         $user = $request->user()->load('posts');
         return response()->json(new RestResource($user, 'Data pengguna berhasil diambil.'), 200);
+    }
+
+    /**
+     * Change user photo.
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function changePhoto(ChangePhotoRequest $request)
+    {
+        $user = $request->user();
+
+        // Jika request memiliki parameter 'delete'
+        if (isset($request->delete)) {
+            if (Storage::disk('public')->exists("img/users/{$user->photo}")) {
+                Storage::disk('public')->delete("img/users/{$user->photo}");
+            }
+
+            // Mengubah foto pengguna menjadi foto default
+            $user->update(['photo' => 'photo.png']);
+
+            return response()->json(new RestResource($user, 'Foto kamu berhasil dihapus.'), 200);
+        }
+
+        // Mengambil file foto dari request
+        $photo = $request->file('photo');
+
+        // compress the image
+        $manager = new ImageManager(Driver::class);
+        $photoRead = $manager->read($photo);
+        $photoEncode = $photoRead->encode(new AutoEncoder(quality: 20));
+
+        // Menghapus foto lama jika ada
+        if (Storage::disk('public')->exists("img/users/{$user->photo}")) {
+            Storage::disk('public')->delete("img/users/{$user->photo}");
+        }
+
+        // Menyimpan foto baru ke dalam penyimpanan
+        $fileName = uniqid('photo_') . '.' . $photo->getClientOriginalExtension();
+        $photoEncode->save(storage_path("app/public/img/users/{$fileName}"));
+
+        $user->update(['photo' => $fileName]);
+
+        return response()->json(new RestResource($user, 'Foto kamu berhasil diubah.'), 200);
+    }
+
+    /**
+     * Update user profile.
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        $user = $request->user();
+
+        // Jika request memiliki parameter 'password'
+        if (isset($request->password)) {
+            if (!password_verify($request->password, $user->password)) {
+                return response()->json([
+                    'message' => 'Password lama yang kamu tidak sesuai.',
+                    'errors' => [
+                        'password' => ['Password lama yang kamu tidak sesuai.'],
+                    ],
+                ]);
+            }
+
+            // Mengubah password pengguna
+            $user->update(['password' => $request->new_password]);
+
+            return response()->json(new RestResource($user, 'Password kamu berhasil diubah.'), 200);
+        }
+
+        // Isi data baru ke model user
+        $user->fill([
+            'name' => $request->name ?? $user->name,
+            'username' => $request->username ?? $user->username,
+        ]);
+
+        // Cek apakah ada perubahan
+        if (!$user->isDirty()) {
+            return response()->json(new RestResource(null, 'Tidak ada perubahan pada profil kamu.', false), 400);
+        }
+
+        // Simpan perubahan
+        $user->save();
+
+        return response()->json(new RestResource($user, 'Profil kamu berhasil diubah.'), 200);
     }
 }
