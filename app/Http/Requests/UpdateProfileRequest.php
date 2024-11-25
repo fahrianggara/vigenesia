@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProfileRequest extends FormRequest
 {
@@ -23,7 +24,13 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string|max:30|min:3',
-            'username' => 'nullable|string|max:30|unique:users,username|regex:/^[a-z0-9]+$/',
+            'username' => [
+                'nullable',
+                'string',
+                'max:30',
+                'regex:/^[a-z0-9]+$/',
+                Rule::unique('users', 'username')->ignore($this->user()->id),
+            ],
             'password' => $this->input('password') ? 'required|string' : 'nullable',
             'new_password' => $this->input('password') ? 'required|string|min:8|max:16' : 'nullable',
             'password_confirmation' => $this->input('password') ? 'required|same:new_password' : 'nullable',
