@@ -190,7 +190,7 @@ class AuthController extends Controller
                     'errors' => [
                         'password' => ['Password lama yang kamu tidak sesuai.'],
                     ],
-                ]);
+                ], 422);
             }
 
             // Mengubah password pengguna
