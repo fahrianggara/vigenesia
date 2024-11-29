@@ -30,7 +30,7 @@ class PostController extends Controller
             ->take(4)
             ->get();
 
-        return response()->json(new RestResource($posts, 'Data Postingan Berhasil Diambil!'), 200);
+        return response()->json(new RestResource($posts, 'Postingan Berhasil Diambil!'), 200);
     }
 
     /**
@@ -68,7 +68,7 @@ class PostController extends Controller
 
         // Jika data post kosong
         if ($posts->isEmpty()) {
-            return response()->json(new RestResource([], 'Data Postingan Kosong!', false), 404);
+            return response()->json(new RestResource([], 'Postingan Kosong!', false), 404);
         }
 
         // Total semua post untuk menentukan ada tidaknya halaman berikutnya
@@ -83,7 +83,7 @@ class PostController extends Controller
         return response()->json(
             [
                 'status' => true,
-                'message' => 'Data Postingan Berhasil Diambil!',
+                'message' => 'Postingan Berhasil Diambil!',
                 'data' => $posts,
                 'has_more' => $hasMore,
                 'total' => $totalPosts,
@@ -104,11 +104,11 @@ class PostController extends Controller
 
         // Jika data post kosong
         if (!$post) {
-            return response()->json(new RestResource([], 'Data Postingan Tidak Ditemukan!', false), 404);
+            return response()->json(new RestResource([], 'Postingan Tidak Ditemukan!', false), 404);
         }
 
         // Jika data post tidak kosong
-        return response()->json(new RestResource($post, 'Data Postingan Berhasil Diambil!'), 200);
+        return response()->json(new RestResource($post, 'Postingan Berhasil Diambil!'), 200);
     }
 
     /**
@@ -152,7 +152,7 @@ class PostController extends Controller
         $post = Post::query()->create($input);
 
         // 201 Created response
-        return response()->json(new RestResource($post, 'Data Postingan Berhasil Ditambahkan!'), 201);
+        return response()->json(new RestResource($post, 'Postingan kamu berhasil dibuat!'), 201);
     }
 
     /**
@@ -171,13 +171,8 @@ class PostController extends Controller
 
         // Jika data post kosong
         if (!$post) {
-            return response()->json(new RestResource([], 'Data Postingan Tidak Ditemukan!', false), 404);
+            return response()->json(new RestResource([], 'Postingan Tidak Ditemukan!', false), 404);
         }
-
-        // Jika user yang mengedit bukan pemilik post
-        // if ($request->user()->id != $post->user_id) {
-        //     return response()->json(new RestResource([], 'Anda tidak memiliki akses untuk mengedit postingan ini!', false), 403);
-        // }
 
         // Jika slug ada yang sama
         if (Post::query()->where('slug', Str::slug($input['title']))->where('id', '!=', $id)->exists()) {
@@ -220,7 +215,7 @@ class PostController extends Controller
         $post->update($input);
 
         // 200 OK response
-        return response()->json(new RestResource($post, 'Data Postingan Berhasil Diubah!'), 200);
+        return response()->json(new RestResource($post, 'Postingan kamu berhasil Diubah!'), 200);
     }
 
     /**
@@ -236,13 +231,8 @@ class PostController extends Controller
 
         // Jika data post kosong
         if (!$post) {
-            return response()->json(new RestResource([], 'Data Postingan Tidak Ditemukan!', false), 404);
+            return response()->json(new RestResource([], 'Postingan Tidak Ditemukan!', false), 404);
         }
-
-        // Jika user yang menghapus bukan pemilik post
-        // if ($request->user()->id !== $post->user_id) {
-        //     return response()->json(new RestResource([], 'Anda tidak memiliki akses untuk menghapus postingan ini!', false), 403);
-        // }
 
         // Hapus thumbnail
         if (Storage::disk('public')->exists("img/posts/{$post->thumbnail}")) {
@@ -253,7 +243,7 @@ class PostController extends Controller
         $post->delete();
 
         // 200 OK response
-        return response()->json(new RestResource([], 'Data Postingan Berhasil Dihapus!'), 200);
+        return response()->json(new RestResource([], 'Postingan kamu berhasil dihapus!'), 200);
     }
 
     /**
